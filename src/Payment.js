@@ -1,25 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Payment.css";
 import { useStateValue } from "./StateProvider";
 import CheckoutProduct from "./CheckoutProduct";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import CurrencyFormat from "react-currency-format";
 import { getBasketTotal } from "./reducer";
+import axios from "./axios";
+import { Start } from "@mui/icons-material";
 
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
+  const navigate = useNavigate();
 
   const stripe = useStripe();
   const elements = useElements();
 
-  const [processing, setProcessing] = useState();
-  const [succeeded, setSucceeded] = useState();
+  const [processing, setProcessing] = useState("");
+  const [succeeded, setSucceeded] = useState(false);
   const [error, setError] = useState(null);
   const [disabled, setDisabled] = useState(null);
+  const [clientSecret, setClientSecret] = useState(true);
+
+  useEffect(() => {
+    // generate the special stripe secret which allows us to charge a customer
+    const getClientSecret = async () => {
+      const response = await axios({
+        method: "post",
+        // Stripe expects the total in a currencies subunits: e.g. *100 for $
+        url: `/payments/create?total=${getBasketTotal(basket) * 100}`,
+      });
+      setClientSecret(response.data.clientSecret);
+    };
+    getClientSecret();
+  }, [basket]);
+
+  console.log("THE SECRET IS >>>", clientSecret);
 
   const handleSubmit = async (e) => {
     // Do all stripe functions
+    e.preventDefault();
+    setProcessing(true);
+
+    const payload = await stripe
+      .confirmCardPayment(clientSecret, {
+        payment_method: { card: elements.getElement(CardElement) },
+      })
+      .then(({ paymentIntent }) => {
+        //paymentIntent = payment confirmation
+
+        setSucceeded(true);
+        setError(null);
+        setProcessing(false);
+
+        dispatch({
+          type: "EMPTY_BASKET",
+        });
+        navigate("/orders");
+      });
   };
 
   const handleChange = (e) => {
@@ -59,6 +97,7 @@ function Payment() {
           <div className="payment_items">
             {basket.map((item) => (
               <CheckoutProduct
+                key={item.id}
                 id={item.id}
                 title={item.title}
                 image={item.image}
