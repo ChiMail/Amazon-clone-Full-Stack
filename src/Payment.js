@@ -7,7 +7,9 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import CurrencyFormat from "react-currency-format";
 import { getBasketTotal } from "./reducer";
 import axios from "./axios";
-import { Start } from "@mui/icons-material";
+import { db } from "./firebase";
+// import { ref, set } from "firebase/database";
+import { collection, addDoc, setDoc, doc, set } from "firebase/firestore";
 
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
@@ -36,6 +38,7 @@ function Payment() {
   }, [basket]);
 
   console.log("THE SECRET IS >>>", clientSecret);
+  console.log("USER:", user);
 
   const handleSubmit = async (e) => {
     // Do all stripe functions
@@ -47,7 +50,38 @@ function Payment() {
         payment_method: { card: elements.getElement(CardElement) },
       })
       .then(({ paymentIntent }) => {
-        //paymentIntent = payment confirmation
+        // db.ref(`/users/${user?.uid}/orders/${paymentIntent.id}`).set({
+        //   basket: basket,
+        //   amount: paymentIntent.amount,
+        //   created: paymentIntent.created,
+        // });
+        const field = {
+          basket: basket,
+          amount: paymentIntent.amount,
+          created: paymentIntent.created,
+        };
+        // addDoc(
+        //   setDoc(
+        //     collection(db, `users/${user?.uid}/orders/`),
+        //     paymentIntent.id
+        //   ),
+        //   { field }
+        // );
+
+        setDoc(
+          doc(collection(db, `users/${user?.uid}/orders/`), paymentIntent.id),
+          { field }
+        );
+
+        // db.collection("users")
+        //   .doc(user?.uid)
+        //   .collection("orders")
+        //   .doc(paymentIntent.id)
+        //   .set({
+        //     basket: basket,
+        //     amount: paymentIntent.amount,
+        //     created: paymentIntent.created,
+        //   });
 
         setSucceeded(true);
         setError(null);
