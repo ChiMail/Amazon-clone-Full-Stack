@@ -8,8 +8,7 @@ import CurrencyFormat from "react-currency-format";
 import { getBasketTotal } from "./reducer";
 import axios from "./axios";
 import { db } from "./firebase";
-// import { ref, set } from "firebase/database";
-import { collection, addDoc, setDoc, doc, set } from "firebase/firestore";
+import { collection, setDoc, doc } from "firebase/firestore";
 
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
@@ -50,29 +49,18 @@ function Payment() {
         payment_method: { card: elements.getElement(CardElement) },
       })
       .then(({ paymentIntent }) => {
-        // db.ref(`/users/${user?.uid}/orders/${paymentIntent.id}`).set({
-        //   basket: basket,
-        //   amount: paymentIntent.amount,
-        //   created: paymentIntent.created,
-        // });
         const field = {
           basket: basket,
           amount: paymentIntent.amount,
           created: paymentIntent.created,
         };
-        // addDoc(
-        //   setDoc(
-        //     collection(db, `users/${user?.uid}/orders/`),
-        //     paymentIntent.id
-        //   ),
-        //   { field }
-        // );
 
         setDoc(
           doc(collection(db, `users/${user?.uid}/orders/`), paymentIntent.id),
           { field }
         );
 
+        // In the video, they used Version 8
         // db.collection("users")
         //   .doc(user?.uid)
         //   .collection("orders")
