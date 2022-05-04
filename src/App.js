@@ -4,7 +4,7 @@ import Home from "./Home";
 import Checkout from "./Checkout";
 import Login from "./Login";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import Payment from "./Payment";
@@ -17,7 +17,11 @@ const promise = loadStripe(
 );
 
 function App() {
-  const [{}, dispatch] = useStateValue();
+  const [{ basket, user }, dispatch] = useStateValue();
+  const [paymentIntentId, setPaymentIntentId] = useState("none");
+  const setId = (id) => {
+    setPaymentIntentId(id);
+  };
 
   useEffect(() => {
     // Will only run once when the app component loads
@@ -38,7 +42,7 @@ function App() {
         });
       }
     });
-  }, []);
+  }, [paymentIntentId]);
 
   return (
     <Router>
@@ -46,7 +50,11 @@ function App() {
         <Routes>
           <Route exact path="/login/" element={<Login />} />
           <Route exact path="/" element={[<Header />, <Home />]} />
-          <Route exact path="/orders" element={[<Header />, <Orders />]} />
+          <Route
+            exact
+            path="/orders"
+            element={[<Header />, <Orders paymentIntentId={paymentIntentId} />]}
+          />
           <Route exact path="/checkout" element={[<Header />, <Checkout />]} />
           <Route
             exact
@@ -54,7 +62,7 @@ function App() {
             element={[
               <Header />,
               <Elements stripe={promise}>
-                <Payment />
+                <Payment setID={setId} />
               </Elements>,
             ]}
           />

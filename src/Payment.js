@@ -10,7 +10,7 @@ import axios from "./axios";
 import { db } from "./firebase";
 import { collection, setDoc, doc } from "firebase/firestore";
 
-function Payment() {
+function Payment(props) {
   const [{ basket, user }, dispatch] = useStateValue();
   const navigate = useNavigate();
 
@@ -70,6 +70,7 @@ function Payment() {
         //     amount: paymentIntent.amount,
         //     created: paymentIntent.created,
         //   });
+        props.setID(paymentIntent.id);
 
         setSucceeded(true);
         setError(null);
