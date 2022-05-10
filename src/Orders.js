@@ -54,32 +54,34 @@ function Orders(paymentIntentId) {
     <div className="orders">
       <h1>Your Orders</h1>
 
-      {/* Moved from Order.js*/}
-      <h2>Order</h2>
-      <p>{moment.unix(date).format("MMMM Do YYYY, h:mma")}</p>
-      <p className="orders_id">
-        <small>Order Id: {id}</small>
-      </p>
+      <div className="order">
+        {/* Moved from Order.js*/}
+        <h2>Order</h2>
+        <p>{moment.unix(date).format("MMMM Do YYYY, h:mma")}</p>
+        <p className="orders_id">
+          <small>Order Id: {paymentIntentId.paymentIntentId}</small>
+        </p>
 
-      {/* Removed .map() since it is done in Order.js */}
-      <div className="orders_order">
-        {/* {orders?.map((order) => (
+        {/* Removed .map() since it is done in Order.js */}
+        <div className="orders_order">
+          {/* {orders?.map((order) => (
           <Order order={order} />
         ))} */}
-        <Order order={orders} />
-      </div>
+          <Order order={orders} />
+        </div>
 
-      {/* Moved from Order.js*/}
-      <CurrencyFormat
-        renderText={(value) => (
-          <h3 className="orders_total">Order Total: {value}</h3>
-        )}
-        decimalScale={2}
-        value={amount / 100}
-        displayType={"text"}
-        thousandSeparator={true}
-        prefix={"$"}
-      />
+        {/* Moved from Order.js*/}
+        <CurrencyFormat
+          renderText={(value) => (
+            <h3 className="orders_total">Order Total: {value}</h3>
+          )}
+          decimalScale={2}
+          value={amount / 100}
+          displayType={"text"}
+          thousandSeparator={true}
+          prefix={"$"}
+        />
+      </div>
     </div>
   );
 }
