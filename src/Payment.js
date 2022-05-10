@@ -49,15 +49,13 @@ function Payment(props) {
         payment_method: { card: elements.getElement(CardElement) },
       })
       .then(({ paymentIntent }) => {
-        const field = {
-          basket: basket,
-          amount: paymentIntent.amount,
-          created: paymentIntent.created,
-        };
-
         setDoc(
           doc(collection(db, `users/${user?.uid}/orders/`), paymentIntent.id),
-          { field }
+          {
+            basket: basket,
+            amount: paymentIntent.amount,
+            created: paymentIntent.created,
+          }
         );
 
         // In the video, they used Version 8

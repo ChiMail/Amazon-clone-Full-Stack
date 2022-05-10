@@ -1,18 +1,18 @@
 import React from "react";
 import "./Order.css";
 import CheckoutProduct from "./CheckoutProduct";
+import CurrencyFormat from "react-currency-format";
+import moment from "moment";
 
 function Order({ order }) {
   return (
     <div className="order">
-      {/*  Moved to Orders.js
+      {/* Moved to Orders.js */}
       <h2>Order</h2>
-
       <p>{moment.unix(order.date).format("MMMM Do YYYY, h:mma")}</p>
       <p className="order_id">
         <small>{order.id}</small>
-      </p> */}
-
+      </p>
       {order.basket?.map((item) => (
         <CheckoutProduct
           id={item.id}
@@ -24,7 +24,7 @@ function Order({ order }) {
         />
       ))}
 
-      {/* Moved to Orders.js
+      {/* Moved to Orders.js */}
       <CurrencyFormat
         renderText={(value) => (
           <h3 className="order_total">Order Total: {value}</h3>
@@ -34,7 +34,7 @@ function Order({ order }) {
         displayType={"text"}
         thousandSeparator={true}
         prefix={"$"}
-      /> */}
+      />
     </div>
   );
 }
