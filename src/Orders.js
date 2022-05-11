@@ -3,7 +3,7 @@ import "./Orders.css";
 import { useStateValue } from "./StateProvider";
 import { db } from "./firebase";
 import Order from "./Order";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, orderBy } from "firebase/firestore";
 
 function Orders(paymentIntentId) {
   const [{ basket, user }, dispatch] = useStateValue();
@@ -14,10 +14,8 @@ function Orders(paymentIntentId) {
       console.log("paymentIntentId from Parent >>>>> ", paymentIntentId);
 
       getDocs(
-        query(
-          collection(db, `users/${user?.uid}/orders`),
-          orderBy("created", "desc")
-        )
+        collection(db, `users/${user?.uid}/orders`),
+        orderBy("created", "desc")
       ).then((snapshot) =>
         setOrders(
           snapshot.docs.map((doc) => ({
